@@ -11,8 +11,10 @@ export const maxDuration = 30;
 export default function Chat() {
   const [messages, setMessages] = useState<CoreMessage[]>([]);
   const [input, setInput] = useState('');
+  const [data, setData] = useState<any>();
   return (
     <div className="flex flex-col w-full max-w-md py-24 mx-auto stretch">
+      {data && <pre>{JSON.stringify(data, null, 2)}</pre>}
       {messages.map((m, i) => (
         <div key={i} className="whitespace-pre-wrap">
           {m.role === 'user' ? 'User: ' : 'AI: '}
@@ -32,8 +34,9 @@ export default function Chat() {
           setInput('');
 
           const result = await continueConversation(newMessages);
+          setData(result.data);
 
-          for await (const content of readStreamableValue(result)) {
+          for await (const content of readStreamableValue(result.message)) {
             setMessages([
               ...newMessages,
               {
